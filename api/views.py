@@ -1,12 +1,13 @@
-from django.shortcuts import render
+from django.conf import settings
 from django.http import HttpResponse
 import requests
 
-API_KEY = ''
+if settings.DEBUG:
+    API_KEY=settings.API_KEY
 
 # Create your views here.
 def get_recipe(request, id=None):
-    url=f'https://api.spoonacular.com/recipes/findByIngredients?ingredients=onions&apiKey={API_KEY}&number=1&limitLicense=true&ranking=1&ignorePantry=false&sortDirection=asc&addRecipeInformation=true&instructionsRequired=true&maxReadyTime=5'
+    url=f'https://api.spoonacular.com/recipes/complexSearch?includeIngredients=tomato,cheese&apiKey={API_KEY}'
     response = requests.get(url)
     data = response.json()
     return HttpResponse(data)
