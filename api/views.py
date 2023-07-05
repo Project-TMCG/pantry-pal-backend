@@ -1,13 +1,18 @@
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import JsonResponse
 import requests
+
+API_KEY = ''
 
 if settings.DEBUG:
     API_KEY=settings.API_KEY
 
+def assembleUrl(queryParams):
+    url=f'https://api.spoonacular.com/recipes/complexSearch?apiKey={API_KEY}'
+
 # Create your views here.
-def get_recipe(request, id=None):
-    url=f'https://api.spoonacular.com/recipes/complexSearch?includeIngredients=tomato,cheese&apiKey={API_KEY}'
+def get_recipe(request, ingredients):
+    
     response = requests.get(url)
     data = response.json()
-    return HttpResponse(data)
+    return JsonResponse(data)
