@@ -57,13 +57,15 @@ def get_recipe(request):
     body_data = parseBody(request)
     url = constructComplexQueryUrl(body_data)
 
-    #Create Response Object
-
-    #Search for Recipes using Spoonacular Complex Search
+    #Search for Recipes using Spoonacular Complex Search Route
     complexSearch = requests.get(url)
     complexSearchResults = complexSearch.json()
 
-    #Search for Recipe Info using Spoonacular Recipe Information Bulk
+    #If there are no matching Recipes - Return custom response.
+    if (len(complexSearchResults["results"]) == 0):
+        return HttpResponse("No matching recipes.")
+
+    #Search for Recipe Info using Spoonacular Recipe Information Bulk Route
     url = constructRecipeInfoQueryUrl(complexSearchResults)
     recipeInfoBulk = requests.get(url)
     recipeInfoBulkResults = recipeInfoBulk.json()
