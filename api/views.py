@@ -40,7 +40,6 @@ def grabIds(complexSearchResults):
     for i in complexSearchResults['results']:
         ids = ids + f"{i['id']},"
 
-    print(ids)
     return ids
 
 def constructRecipeInfoQueryUrl(complexSearchResults):
@@ -48,6 +47,52 @@ def constructRecipeInfoQueryUrl(complexSearchResults):
     url=f'https://api.spoonacular.com/recipes/informationBulk?apiKey={API_KEY}&ids={ids}'
 
     return url
+
+def formatReponse(recipeInfoBulkResults):
+    response = { "results": [] }
+
+    def formatIngredients(recipe):
+
+        allIngredients = []
+
+        for ingredient in recipe.extendedIngredients:
+            formattedIngredient = {
+                "name": ingredient.nameClean,
+                "original": ingredient.original,
+                "amount": ingredient.amount,
+                "unit": ingredient.unit
+            }
+
+            allIngredients.append(formattedIngredient)
+
+        return allIngredients
+
+
+    for recipe in recipeInfoBulkResults:
+        recipeData = {
+            "id": recipe.id,
+            "title": recipe.title,
+            "servings": recipe.servings,
+            "sourceName": recipe.sourceName,
+            "sourceUrl": recipe.sourceUrl,
+            "summary": recipe.summary,
+            "cuisines": recipe.cuisines,
+            "dishTypes": recipe.dishTypes,
+            "diets": recipe.diets,
+            "glutenFree": recipe.glutenFree,
+            "sustainable": recipe.sustainable,
+            "veryHealthy": recipe.veryHealthy,
+            "cheap": recipe.cheap,
+            "veryPopular": recipe.veryPopular,
+            "healthScore": recipe.healthScore,
+            "pricePerServing": recipe.pricePerServing,
+            "aggregateLikes": recipe.aggregateMinutes,
+            "preparationMinutes": recipe.preparationMinutes,
+            "cookingMinutes": recipe.cookingMinutes,
+            "ingredients": formatIngredients(recipe.extendedIngredients)
+
+        }
+
 
 # %$%$%$%$%$%$% Views %$%$%$%$%$%$%
 
@@ -70,4 +115,6 @@ def get_recipe(request):
     recipeInfoBulk = requests.get(url)
     recipeInfoBulkResults = recipeInfoBulk.json()
 
-    return JsonResponse(recipeInfoBulkResults, safe=False)
+    response = formatReponse(recipeInfoBulkResults)
+
+    return JsonResponse(response, safe=False)
