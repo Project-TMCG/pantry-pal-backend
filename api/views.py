@@ -48,51 +48,68 @@ def constructRecipeInfoQueryUrl(complexSearchResults):
 
     return url
 
-def formatReponse(recipeInfoBulkResults):
-    response = { "results": [] }
 
-    def formatIngredients(recipe):
+#   ------- Helper Function to formatResponse Below -------
+def formatIngredients(extendedIngredients):
 
-        allIngredients = []
+    allIngredients = {}
 
-        for ingredient in recipe.extendedIngredients:
-            formattedIngredient = {
-                "name": ingredient.nameClean,
-                "original": ingredient.original,
-                "amount": ingredient.amount,
-                "unit": ingredient.unit
-            }
+    for ingredient in extendedIngredients:
 
-            allIngredients.append(formattedIngredient)
-
-        return allIngredients
-
-
-    for recipe in recipeInfoBulkResults:
-        recipeData = {
-            "id": recipe.id,
-            "title": recipe.title,
-            "servings": recipe.servings,
-            "sourceName": recipe.sourceName,
-            "sourceUrl": recipe.sourceUrl,
-            "summary": recipe.summary,
-            "cuisines": recipe.cuisines,
-            "dishTypes": recipe.dishTypes,
-            "diets": recipe.diets,
-            "glutenFree": recipe.glutenFree,
-            "sustainable": recipe.sustainable,
-            "veryHealthy": recipe.veryHealthy,
-            "cheap": recipe.cheap,
-            "veryPopular": recipe.veryPopular,
-            "healthScore": recipe.healthScore,
-            "pricePerServing": recipe.pricePerServing,
-            "aggregateLikes": recipe.aggregateMinutes,
-            "preparationMinutes": recipe.preparationMinutes,
-            "cookingMinutes": recipe.cookingMinutes,
-            "ingredients": formatIngredients(recipe.extendedIngredients)
-
+        formattedIngredient = {
+            "original": ingredient.original,
+            "amount": ingredient.amount,
+            "unit": ingredient.unit
         }
 
+        allIngredients[ingredient.name] = formattedIngredient
+
+    return allIngredients
+
+
+def formatInstructions(analyzedInstructions):
+    pass
+
+#   ------- Format's the Response Object -------
+def formatReponse(recipeInfoBulkResults):
+    response = {}
+
+    for recipe in recipeInfoBulkResults:
+
+        recipeData = {
+            **recipe,
+            "ingredients": formatIngredients(recipe.extendedIngredients),
+            "instructionSummary": recipe.instructions,
+            "instructionSteps": formatInstructions(recipe.analyzedInstructions)
+        }
+
+        removeKeys = [
+            "vegetarian",
+            "vegan",
+            "glutenFree",
+            "lowFodmap",
+            "weightWatcherSmartPoints",
+            "gaps",
+            "imageType",
+            "instructions",
+            "analyzedInstructions",
+            "report",
+            "suspiciousDataScore",
+            "approved",
+            "unknownIngredients",
+            "userTags",
+            "originalId",
+            "winePairing",
+            "occasions"
+        ]
+
+        for key in removeKeys:
+            recipeData.pop(key, None)
+
+
+        response[recipe.title] = recipeData
+
+    return response
 
 # %$%$%$%$%$%$% Views %$%$%$%$%$%$%
 
