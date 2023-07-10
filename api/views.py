@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 import requests
 import json
 
@@ -15,23 +15,76 @@ if settings.DEBUG:
 #   ------- Grabs Query Params from the Request Body -------
 def parseBody(request):
 
-    body_unicode = request.body.decode('utf-8')
-    body_data = json.loads(body_unicode)
-    return body_data
+    bodyUnicode = request.body.decode('utf-8')
+    bodyData = json.loads(bodyUnicode)
+    return bodyData
+
+#   ------- Check Query Params from Request Body -------
+def checkBodyParams(bodyData):
+
+    invalidParams = []
+
+    validParams = {
+        "number": None,
+        "cuisine": None,
+        "excludeCuisine": None,
+        "diet": None,
+        "intolerances": None,
+        "equipment": None,
+        "includeIngredients": None,
+        "excludeIngredients": None,
+        "type": None,
+        "fillIngredients": None,
+        "addRecipeInformation": None,
+        "addRecipeNutrition": None,
+        "author": None,
+        "tags": None,
+        "recipeBoxId": None,
+        "titleMatch": None,
+        "maxReadyTime": None,
+        "ignorePantry": None,
+        "sort": None,
+        "sortDirection": None,
+        "minCarbs": None,
+        "maxCarbs": None,
+        "minProtein": None,
+        "maxProtein": None,
+        "minCalories": None,
+        "maxCalories": None,
+        "minFat": None,
+        "maxFat": None,
+        "minAlchohol": None,
+        "maxAlchohol": None,
+        "minCaffeine": None,
+        "maxCaffeine": None,
+        "minCholesterol": None,
+        "maxCholesterol": None,
+        "minFiber": None,
+        "maxFiber": None,
+        "minSugar": None,
+        "maxSugar": None,
+        "offset": None,
+    }
+
+    for param in bodyData:
+        if (param not in validParams):
+            invalidParams.append(param)
+    
+    return invalidParams
 
 #   ------- Constructs Query Url for the Complex Search Endpoint -------
-def constructComplexQueryUrl(body_data):
+def constructComplexQueryUrl(bodyData):
 
     url=f'https://api.spoonacular.com/recipes/complexSearch?apiKey={API_KEY}&instructionsRequired=true'
 
-    if("number" in body_data):
-        url = url + f'&number={body_data["number"]}'
+    if("number" in bodyData):
+        url = url + f'&number={bodyData["number"]}'
     else:
         url = url + '&number=10'
 
-    for key in body_data:
+    for key in bodyData:
         if(key != "number"):
-            url = url + f'&{key}={body_data[key]}'
+            url = url + f'&{key}={bodyData[key]}'
 
     return url
 
@@ -140,10 +193,16 @@ def formatReponse(recipeInfoBulkResults):
 def get_recipe(request):
 
     #Parse Body
-    body_data = parseBody(request)
-    url = constructComplexQueryUrl(body_data)
+    bodyData = parseBody(request)
+
+    #Check Query Params from Request Body
+    invalidParams = checkBodyParams(bodyData)
+    if (len(invalidParams) != 0):
+        message = f"Invalid params in request body. Invalid params include: {invalidParams}."
+        return HttpResponseBadRequest(message)   
 
     #Query the Complex Search Endpoint
+    url = constructComplexQueryUrl(bodyData)
     complexSearch = requests.get(url)
     complexSearchResults = complexSearch.json()
 
