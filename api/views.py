@@ -3,7 +3,6 @@ from django.http import JsonResponse, HttpResponse
 import requests
 import json
 
-
 # %$%$%$%$%$%$% Environ Variable %$%$%$%$%$%$%
 
 API_KEY = ''
@@ -13,12 +12,14 @@ if settings.DEBUG:
 
 # %$%$%$%$%$%$% Helper Functions %$%$%$%$%$%$%
 
+#   ------- Grabs Query Params from the Request Body -------
 def parseBody(request):
 
     body_unicode = request.body.decode('utf-8')
     body_data = json.loads(body_unicode)
     return body_data
 
+#   ------- Constructs Query Url for the Complex Search Endpoint -------
 def constructComplexQueryUrl(body_data):
 
     url=f'https://api.spoonacular.com/recipes/complexSearch?apiKey={API_KEY}&instructionsRequired=true'
@@ -34,6 +35,7 @@ def constructComplexQueryUrl(body_data):
 
     return url
 
+#   ------- Grabs the Recipe Ids from the result of the Complex Search Endpoint -------
 def grabIds(complexSearchResults):
     ids = ''
 
@@ -42,12 +44,13 @@ def grabIds(complexSearchResults):
 
     return ids
 
+
+#   ------- Constructs Query Url for the Recipe Info Bulk Endpoint -------
 def constructRecipeInfoQueryUrl(complexSearchResults):
     ids = grabIds(complexSearchResults)
     url=f'https://api.spoonacular.com/recipes/informationBulk?apiKey={API_KEY}&ids={ids}'
 
     return url
-
 
 #   ------- Helper Function to formatResponse Below -------
 def formatIngredients(extendedIngredients):
@@ -57,36 +60,54 @@ def formatIngredients(extendedIngredients):
     for ingredient in extendedIngredients:
 
         formattedIngredient = {
-            "original": ingredient.original,
-            "amount": ingredient.amount,
-            "unit": ingredient.unit
+            "original": ingredient["original"],
+            "amount": ingredient["amount"],
+            "unit": ingredient["unit"]
         }
 
-        allIngredients[ingredient.name] = formattedIngredient
+        allIngredients[ingredient["name"]] = formattedIngredient
 
     return allIngredients
 
+#   ------- Helper Function to formatResponse Below -------
+def formatInstructions(allSteps):
+    instructionSteps = {}
+    
+    def extractNames(container):
+        allNames = []
 
-def formatInstructions(analyzedInstructions):
-    pass
+        for item in container:
+            allNames.append(item["name"])
+
+        return allNames
+
+    for step in allSteps:
+
+        formattedStep = {
+            **step,
+            "ingredients": extractNames(step["ingredients"]),
+            "equipment": extractNames(step["equipment"])
+        }
+
+        instructionSteps[step["number"]] = formattedStep
+
+    return instructionSteps
 
 #   ------- Format's the Response Object -------
 def formatReponse(recipeInfoBulkResults):
+
     response = {}
 
     for recipe in recipeInfoBulkResults:
 
         recipeData = {
             **recipe,
-            "ingredients": formatIngredients(recipe.extendedIngredients),
-            "instructionSummary": recipe.instructions,
-            "instructionSteps": formatInstructions(recipe.analyzedInstructions)
+            "ingredients": formatIngredients(recipe["extendedIngredients"]),
+            "instructionSummary": recipe["instructions"],
+            "instructionSteps": formatInstructions(recipe["analyzedInstructions"][0]["steps"])
         }
 
         removeKeys = [
-            "vegetarian",
-            "vegan",
-            "glutenFree",
             "lowFodmap",
             "weightWatcherSmartPoints",
             "gaps",
@@ -100,14 +121,17 @@ def formatReponse(recipeInfoBulkResults):
             "userTags",
             "originalId",
             "winePairing",
-            "occasions"
+            "occasions",
+            "extendedIngredients",
+            "openLicense",
+            "spoonacularSourceUrl",
         ]
 
         for key in removeKeys:
             recipeData.pop(key, None)
 
 
-        response[recipe.title] = recipeData
+        response[recipe["title"]] = recipeData
 
     return response
 
@@ -119,7 +143,7 @@ def get_recipe(request):
     body_data = parseBody(request)
     url = constructComplexQueryUrl(body_data)
 
-    #Search for Recipes using Spoonacular Complex Search Route
+    #Query the Complex Search Endpoint
     complexSearch = requests.get(url)
     complexSearchResults = complexSearch.json()
 
@@ -127,11 +151,13 @@ def get_recipe(request):
     if (len(complexSearchResults["results"]) == 0):
         return HttpResponse("No matching recipes.")
 
-    #Search for Recipe Info using Spoonacular Recipe Information Bulk Route
+    #Query the Recipe Info Bulk Endpoint
     url = constructRecipeInfoQueryUrl(complexSearchResults)
     recipeInfoBulk = requests.get(url)
     recipeInfoBulkResults = recipeInfoBulk.json()
 
+    #Format the Result of the Recipe Info Bulk Endpoint
     response = formatReponse(recipeInfoBulkResults)
 
+    #Return Formatted Response Object
     return JsonResponse(response, safe=False)
