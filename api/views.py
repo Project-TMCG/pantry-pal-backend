@@ -115,7 +115,8 @@ def formatIngredients(extendedIngredients):
         formattedIngredient = {
             "original": ingredient["original"],
             "amount": ingredient["amount"],
-            "unit": ingredient["unit"]
+            "unit": ingredient["unit"],
+            "image": ingredient["image"]
         }
 
         allIngredients[ingredient["name"]] = formattedIngredient
