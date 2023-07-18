@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "pantrypal"
+version = "0.1.0"
+description = "backend for pantrypal app.\u001b[D"
+authors = ["Tom Ames <tsames1@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django = "^4.2.3"
+django-environ = "^0.10.0"
+djangorestframework = "^3.14.0"
+psycopg2-binary = "^2.9.6"
+requests = "^2.31.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

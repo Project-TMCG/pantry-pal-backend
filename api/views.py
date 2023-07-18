@@ -5,10 +5,7 @@ import json
 
 # %$%$%$%$%$%$% Environ Variable %$%$%$%$%$%$%
 
-API_KEY = ''
-
-if settings.DEBUG:
-    API_KEY=settings.API_KEY
+API_KEY=settings.API_KEY
 
 # %$%$%$%$%$%$% Helper Functions %$%$%$%$%$%$%
 
