@@ -31,8 +31,8 @@ API_KEY = getenv('API_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = getenv("DJANGO_ALLOWED_HOSTS").split(" ")
-CORS_ALLOWED_ORIGINS = getenv("CORS_ALLOWED_ORIGINS").split(" ")
+ALLOWED_HOSTS = ["*"]
+CORS_ALLOWED_ORIGINS = ["*"]
 
 # Application definition
 
@@ -133,3 +133,4 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+STATIC_ROOT = '/app/static/'

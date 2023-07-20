@@ -2,7 +2,7 @@
 name = "pantrypal"
 version = "0.1.0"
 description = "backend for pantrypal app.\u001b[D"
-authors = ["Tom Ames <tsames1@gmail.com>"]
+authors = ["Tom Ames <tsamesdev@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -11,6 +11,7 @@ django = "^4.2.3"
 djangorestframework = "^3.14.0"
 requests = "^2.31.0"
 psycopg2 = "^2.9.6"
+gunicorn = "^21.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
