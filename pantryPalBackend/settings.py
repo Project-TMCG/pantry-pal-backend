@@ -29,7 +29,7 @@ SECRET_KEY = getenv('SECRET_KEY')
 API_KEY = getenv('API_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOWED_ORIGINS = ["*"]
