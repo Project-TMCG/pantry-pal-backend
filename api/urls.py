@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import get_recipe
+from .views import fetchRecipes
 
 urlpatterns = [
-    path('recipes/', get_recipe)
+    path('recipes/', fetchRecipes)
 ]

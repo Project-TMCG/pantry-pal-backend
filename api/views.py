@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
 import requests
 import json
 
@@ -187,8 +188,10 @@ def formatReponse(recipeInfoBulkResults):
     return response
 
 # %$%$%$%$%$%$% Views %$%$%$%$%$%$%
+@csrf_exempt
+def fetchRecipes(request):
 
-def get_recipe(request):
+    print(request.method)
 
     #Parse Body
     bodyData = parseBody(request)
