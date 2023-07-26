@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
-# from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 import requests
 import json
 
@@ -188,7 +188,7 @@ def formatReponse(recipeInfoBulkResults):
     return response
 
 # %$%$%$%$%$%$% Views %$%$%$%$%$%$%
-# @csrf_exempt
+@csrf_exempt
 def fetchRecipes(request):
 
     print(request.method)
