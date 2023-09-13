@@ -152,14 +152,15 @@ def formatNutrition(nutritionArray):
 
     for nutrient in nutritionArray:
 
-        if nutrient.name in checkArray:
+        if nutrient["name"] in checkArray:
             formattedNutrient = {
                 "amount": nutrient["amount"],
                 "unit": nutrient["unit"]
             }
 
-            nutritionObject[nutrient.name] = formattedNutrient
+            nutritionObject[nutrient["name"]] = formattedNutrient
 
+    print (nutritionObject)
     return nutritionObject
 
 
