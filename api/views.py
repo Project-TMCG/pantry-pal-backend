@@ -99,7 +99,7 @@ def grabIds(complexSearchResults):
 #   ------- Constructs Query Url for the Recipe Info Bulk Endpoint -------
 def constructRecipeInfoQueryUrl(complexSearchResults):
     ids = grabIds(complexSearchResults)
-    url=f'https://api.spoonacular.com/recipes/informationBulk?apiKey={API_KEY}&ids={ids}'
+    url=f'https://api.spoonacular.com/recipes/informationBulk?apiKey={API_KEY}&ids={ids}&includeNutrition=true'
 
     return url
 
