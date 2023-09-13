@@ -156,7 +156,8 @@ def formatReponse(recipeInfoBulkResults):
             **recipe,
             "ingredients": formatIngredients(recipe["extendedIngredients"]),
             "instructionSummary": recipe["instructions"],
-            "instructionSteps": formatInstructions(recipe["analyzedInstructions"][0]["steps"])
+            "instructionSteps": formatInstructions(recipe["analyzedInstructions"][0]["steps"]),
+            "nutrition": recipe["nutrition"]["nutrients"]
         }
 
         removeKeys = [
