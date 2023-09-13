@@ -75,7 +75,7 @@ def constructComplexQueryUrl(bodyData):
 
     url=f'https://api.spoonacular.com/recipes/complexSearch?apiKey={API_KEY}&instructionsRequired=true'
 
-    if("number" in bodyData):
+    if ("number" in bodyData):
         url = url + f'&number={bodyData["number"]}'
     else:
         url = url + '&number=10'
@@ -145,6 +145,24 @@ def formatInstructions(allSteps):
 
     return instructionSteps
 
+#   ------- Helper Function to formatNutrition Below -------
+def formatNutrition(nutritionArray):
+    nutritionObject = {}
+    checkArray = ["Calories", "Fat", "Saturated Fat", "Carbohydrates", "Sugar", "Cholesterol", "Sodium", "Protein", "Fiber"]
+
+    for nutrient in nutritionArray:
+
+        if nutrient.name in checkArray:
+            formattedNutrient = {
+                "amount": nutrient["amount"],
+                "unit": nutrient["unit"]
+            }
+
+            nutritionObject[nutrient.name] = formattedNutrient
+
+    return nutritionObject
+
+
 #   ------- Format's the Response Object -------
 def formatReponse(recipeInfoBulkResults):
 
@@ -157,7 +175,7 @@ def formatReponse(recipeInfoBulkResults):
             "ingredients": formatIngredients(recipe["extendedIngredients"]),
             "instructionSummary": recipe["instructions"],
             "instructionSteps": formatInstructions(recipe["analyzedInstructions"][0]["steps"]),
-            "nutrition": recipe["nutrition"]["nutrients"]
+            "nutrition": formatNutrition(recipe["nutrition"]["nutrients"])
         }
 
         removeKeys = [
