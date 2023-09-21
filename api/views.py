@@ -110,12 +110,24 @@ def formatIngredients(extendedIngredients):
 
     for ingredient in extendedIngredients:
 
-        formattedIngredient = {
-            "original": ingredient["original"],
-            "amount": ingredient["amount"],
-            "unit": ingredient["unit"],
-            "image": ingredient["image"]
-        }
+        # checks to see if there is an actual image returned in the recipe from the API response
+        if ingredient["image"]:
+            formattedIngredient = {
+                "original": ingredient["original"],
+                "amount": ingredient["amount"],
+                "unit": ingredient["unit"],
+                "image": ingredient["image"]
+            }
+        # adds a generic stock logo img for any recipes that don't have a recipe image from the original API response
+        else:
+            generic_img = "https://i.gyazo.com/ac3588877ac931c5e034528e984a5ad6.png"
+            formattedIngredient = {
+                "original": ingredient["original"],
+                "amount": ingredient["amount"],
+                "unit": ingredient["unit"],
+                "image": generic_img
+            }
+
 
         allIngredients[ingredient["name"]] = formattedIngredient
 
